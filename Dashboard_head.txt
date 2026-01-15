@@ -1,0 +1,101 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import { motion } from 'framer-motion'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Progress } from '@/components/ui/progress'
+import { Download, Loader2, FileText, Zap, Flame, Target, Dumbbell, Apple, Droplets } from 'lucide-react'
+import { toast } from '@/hooks/use-toast'
+
+interface NutritionData {
+  bmr: number
+  tdee: number
+  targetCalories: number
+  proteinGrams: number
+  carbsGrams: number
+  fatsGrams: number
+  proteinPercent: number
+  carbsPercent: number
+  fatsPercent: number
+}
+
+const StatCard = ({ icon: Icon, title, value, description, delay }: any) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20, scale: 0.95 }}
+    animate={{ opacity: 1, y: 0, scale: 1 }}
+    transition={{ delay, duration: 0.5 }}
+    whileHover={{ 
+      scale: 1.05, 
+      boxShadow: '0 20px 40px -12px rgba(0, 0, 0, 0.3)' 
+    }}
+  >
+    <Card className="bg-gradient-to-br from-gray-900/40 to-gray-800/30 dark:from-gray-800/50 dark:to-gray-900/40 border-border/50 backdrop-blur-sm h-full cursor-pointer transition-all duration-300">
+      <CardHeader>
+        <motion.div 
+          className="flex items-center gap-2 mb-2"
+          whileHover={{ x: 5 }}
+          transition={{ duration: 0.2 }}
+        >
+          <Icon className="w-5 h-5 text-foreground/70" />
+          <CardDescription>{title}</CardDescription>
+        </motion.div>
+        <CardTitle className="text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+          {Math.round(value)}
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p className="text-sm text-muted-foreground">{description}</p>
+      </CardContent>
+    </Card>
+  </motion.div>
+)
+
+export default function Dashboard() {
+  const [nutrition, setNutrition] = useState<NutritionData | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [downloading, setDownloading] = useState(false)
+
+  useEffect(() => {
+    fetchNutritionData()
+  }, [])
+
+  const fetchNutritionData = async () => {
+    try {
+      const response = await fetch('/api/nutrition')
+      if (response.ok) {
+        const data = await response.json()
+        setNutrition(data)
+      }
+    } catch (error) {
+      console.error('Failed to fetch nutrition data:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const generatePlan = async () => {
+    try {
+      const response = await fetch('/api/generate-plan', { method: 'POST' })
+      if (!response.ok) throw new Error('Failed to generate plan')
+      
+      // Only show success and fetch new data if response is ok
+      const data = await response.json()
+      if (data.success) {
+        toast({ title: 'Success', description: 'Meal and workout plans generated!' })
+        await fetchNutritionData()
+      }
+    } catch (error) {
+      console.error('Error generating plan:', error)
+      toast({ title: 'Error', description: 'Failed to generate plan. Please try again.', variant: 'destructive' })
+    }
+  }
+
+  const downloadPDF = async () => {
+    setDownloading(true)
+    try {
+      // Fetch all data needed for the PDF
+      const [profileRes, nutritionRes, mealPlanRes, workoutPlanRes, progressRes] = await Promise.all([
+        fetch('/api/profile'),
+===END===

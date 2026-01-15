@@ -1,0 +1,117 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  profile   UserProfile?
+}
+
+model UserProfile {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Personal Data
+  age             Int
+  gender          String
+  height          Float
+  currentWeight   Float
+  bodyFatPercent  Float?
+  language        String   @default("en")
+
+  // Lifestyle
+  activityLevel   String
+  dailySteps      Int?
+  sleepDuration   Float?
+
+  // Training
+  trainingDays    Int
+  trainingType    String
+  primaryGoal     String
+
+  // Nutrition Preferences
+  dietaryStyle    String
+  allergies       String?
+  fastingPattern  String?
+  culturalConstraints String?
+  budget          String
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  nutritionPlans  NutritionPlan[] @relation("NutritionPlans")
+  workoutPlans    WorkoutPlan[] @relation("WorkoutPlans")
+  progressEntries ProgressEntry[] @relation("ProgressEntries")
+  foodAnalyses    FoodAnalysis[] @relation("FoodAnalyses")
+}
+
+model NutritionPlan {
+  id              String   @id @default(cuid())
+  profileId       String
+  profile         UserProfile @relation("NutritionPlans", fields: [profileId], references: [id], onDelete: Cascade)
+
+  // Calculated values
+  bmr             Float
+  tdee            Float
+  targetCalories  Float
+  proteinGrams    Float
+  carbsGrams      Float
+  fatsGrams       Float
+  proteinPercent  Float
+  carbsPercent    Float
+  fatsPercent    Float
+
+  mealPlan        String   // JSON string
+  weeklyAdjustment String? // JSON string with adjustments
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model WorkoutPlan {
+  id              String   @id @default(cuid())
+  profileId       String
+  profile         UserProfile @relation("WorkoutPlans", fields: [profileId], references: [id], onDelete: Cascade)
+
+  weeklySplit     String   // JSON string
+  workoutDays     String   // JSON string
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model ProgressEntry {
+  id              String   @id @default(cuid())
+  profileId       String
+  profile         UserProfile @relation("ProgressEntries", fields: [profileId], references: [id], onDelete: Cascade)
+
+  weight          Float
+  bodyFatPercent  Float?
+  date            DateTime
+  notes           String?
+
+  createdAt       DateTime @default(now())
+}
+
+model FoodAnalysis {
+  id              String   @id @default(cuid())
+  profileId       String
+  profile         UserProfile @relation("FoodAnalyses", fields: [profileId], references: [id], onDelete: Cascade)
+
+  imageUrl        String?
+  analysis        String   // JSON string with food items and nutrition
+  timestamp       DateTime @default(now())
+}
