@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Activity, Apple, Dumbbell, TrendingUp, User, FileText, Camera, BarChart3, Moon, Sun, Code, Sparkles } from 'lucide-react'
+import { Activity, Apple, Dumbbell, TrendingUp, User, BarChart3, Moon, Sun, Code, Sparkles } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 
@@ -16,7 +16,6 @@ import Dashboard from '@/components/Dashboard'
 import MealPlan from '@/components/MealPlan'
 import WorkoutPlan from '@/components/WorkoutPlan'
 import ProgressSection from '@/components/ProgressSection'
-import FoodImageAnalyzer from '@/components/FoodImageAnalyzer'
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('about')
@@ -165,7 +164,7 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-7 h-auto gap-2 bg-card/80 backdrop-blur-xl border border-border/50 shadow-2xl p-1">
+              <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-6 h-auto gap-2 bg-card/80 backdrop-blur-xl border border-border/50 shadow-2xl p-1">
                 {[
                   { value: 'about', icon: User, label: 'About' },
                   { value: 'profile', icon: Activity, label: 'Profile' },
@@ -173,7 +172,6 @@ export default function Home() {
                   { value: 'meal-plan', icon: Apple, label: 'Meal Plan' },
                   { value: 'workout', icon: Dumbbell, label: 'Workout' },
                   { value: 'progress', icon: TrendingUp, label: 'Progress' },
-                  { value: 'food-ai', icon: Camera, label: 'Food AI' },
                 ].map((tab, index) => {
                   const Icon = tab.icon
                   return (
@@ -227,10 +225,6 @@ export default function Home() {
 
                 <TabsContent value="progress">
                   <ProgressSection />
-                </TabsContent>
-
-                <TabsContent value="food-ai">
-                  <FoodImageAnalyzer />
                 </TabsContent>
               </motion.div>
             </AnimatePresence>
